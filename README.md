@@ -8,18 +8,18 @@ Ad Hoc makes a portable application in the PAF (PortableApps.com Format). PAF is
 
 Ad Hoc contains:
 
-  programs for collecting information about the application;
-  programs for preparing and configuring portable application;
-  program for creating launchers for selected executable files;
-  program for packaging portable application into the archive.
+* programs for collecting information about the application;
+* programs for preparing and configuring portable application;
+* program for creating launchers for selected executable files;
+* program for packaging portable application into the archive.
 
 The basic directory layout of each portable app consists of a main directory, PortApp which contains three directories: App, Data and Source:
 
-…\PortApp\App
-…\PortApp\Data
-…\PortApp\Source
-…\PortApp\AppLauncher.portable.exe
-…\PortApp\SetLnch.ini
+* …\PortApp\App
+* …\PortApp\Data
+* …\PortApp\Source
+* …\PortApp\AppLauncher.portable.exe
+* …\PortApp\SetLnch.ini
 
 For more details about structure and about this project see Readme.rtf (in Russian).
 
