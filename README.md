@@ -1,6 +1,6 @@
 # Description
 
-Ad Hoc this is a program that allows you to make a portable application from the typical application. A portable application is a program that runs from any directory and it does not leave any traces of its work in the operating system.
+Ad Hoc is a program that allows you to make a portable application from the typical application. A portable application is a program that runs from any directory and it does not leave any traces of its work in the operating system.
 
 Ad Hoc makes a portable application in the PAF (PortableApps.com Format). PAF is one of the approaches to creating a portable software. (An another way is an application virtualization). PAF software is a typical application with the settings located in the separate directory. All actions with app are managed by the special launcher or launchers.
 
