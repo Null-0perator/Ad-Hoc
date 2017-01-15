@@ -73,17 +73,19 @@ EndIf
 
 Switch @OSLang
    Case "0419", "0819"
-	  Local $Text[10] = ['Упаковщик переносного приложения', 'Введите путь с каталогом "PortApp":', _
+	  Local $Text[12] = ['Упаковщик переносного приложения', 'Введите путь с каталогом "PortApp":', _
 		    'Выберите уровень сжатия:', 'Выполнено', 'Архив с приложением находится здесь:', _
 		    @CRLF & @CRLF & 'Нажмите кнопку <Да>, если вы хотите удалить исходный каталог ' & _
 		    '"PortApp" и создать новый шаблон, <Нет> - только удалить каталог, <Отмена> или <Закрыть> - ' &  _
-		    'оставить данный каталог.', '...', 'OK', 'Прервать', 'Закрыть']
+		    'оставить данный каталог.', '...', 'OK', 'Прервать', 'Закрыть', _
+		    'Каталог ', ' уже существует. Продолжить?']
    Case Else
-	  Local $Text[10] = ['Portable application packer', 'Enter the path with the "PortApp" folder:', _
-		    'Select the compression level:', 'Done', 'Application archive is available here:', _
+	  Local $Text[12] = ['Portable application packer', 'Enter the path with the "PortApp" folder:', _
+		    'Select the compression level:', 'Done', 'Archive with the application is available here:', _
 		    @CRLF & @CRLF & 'Press <Yes> button if you want to delete the "PortApp" directory ' & _
 		    'and create a new template, <No> - just delete directory, <Cancel> or <Close> - ' &  _
-		    'if you don''t want to delete this directory.', '...', 'OK', 'Abort', 'Close']
+		    'if you don''t want to delete this directory.', '...', 'OK', 'Abort', 'Close', _
+		    'Directory ', ' already exists. Do you want to continue?']
 EndSwitch
 
 Local $WinSty[2] = [BitOR($WS_CAPTION, $WS_OVERLAPPED, $WS_SYSMENU, $DS_SETFOREGROUND), $WS_EX_ACCEPTFILES]
@@ -185,15 +187,19 @@ Func _ArchAdd()
 	  DirRemove($Dir[0], 1)
 	  Exit
    EndIf
-   FileWrite($FO[1], 'Local $PrcLst = ProcessList(), $Name' & @CRLF & _
+   FileWrite($FO[1], 'Local $PrcLst = ProcessList(), $Name, $DirName' & @CRLF & _
    'For $i = 1 To $PrcLst[0][0]' & @CRLF & _
    '   If $PrcLst[$i][1] = @AutoItPID Then' & @CRLF & _
    '	  $Name = StringTrimRight($PrcLst[$i][0], 4)' & @CRLF & _
    '	  ExitLoop' & @CRLF & _
    '   EndIf' & @CRLF & _
    'Next' & @CRLF & _
-   'DirCreate(StringReplace("' & StringTrimLeft($Path, StringInStr($Path, "\", 0, -1)) & _
-   '", "' & StringTrimLeft($Path, StringInStr($Path, "\", 0, -1)) & '", $Name, 1))' & @CRLF)
+   '$DirName = StringReplace("' & StringTrimLeft($Path, StringInStr($Path, "\", 0, -1)) & _
+   '", "' & StringTrimLeft($Path, StringInStr($Path, "\", 0, -1)) & '", $Name, 1)' & @CRLF & _
+   'If FileExists($DirName) Then' & @CRLF & _
+   '   If MsgBox(1+32, "", "' & $Text[10] & '""" & $DirName & """' & $Text[11] & '", 10) = 2 Then Exit' & @CRLF & _
+   'EndIf' & @CRLF & _
+   'DirCreate($DirName)' & @CRLF)
    While True
 	  $ReadStr = FileReadLine($FO[0])
 	  If @error = -1 Then ExitLoop

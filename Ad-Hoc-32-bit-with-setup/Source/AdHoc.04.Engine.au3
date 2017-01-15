@@ -269,6 +269,7 @@ EndFunc
 Func _SysSc_1()
    Local $Msv[$DrLst[0]+2], $Run[$IniNumPr], $SumProc, $Bnd, $ArrTmp, $L, $T, $M, $MsvTmp, $Q = 0, $s = 0
    If Not FileExists($Dir[5]) Then DirCreate($Dir[5])
+   $Chk[4] = False
 
    For $i = 0 To 1
 	  $IniVal = IniRead($File[1], "Registry", $IniPrm[$i], "")
@@ -743,6 +744,7 @@ Func _CopyMove()
 			   FileClose($FO[2])
 			   If ProcessExists($RunProc) Then ProcessClose($RunProc)
 			   $Chk[1] = True
+			   $Chk[4] = True
 			   Return
 			Case Else
 			   $s = Int(100*FileGetPos($FO[0])/$EndPos)
@@ -803,6 +805,7 @@ Func _CopyMove()
 			   FileClose($FO[2])
 			   If ProcessExists($RunProc) Then ProcessClose($RunProc)
 			   $Chk[1] = True
+			   $Chk[4] = True
 			   Return
 			Case Else
 			   $s = Int(100*FileGetPos($FO[0])/$EndPos)
@@ -877,6 +880,7 @@ Func _CopyMoveEnd()
 	  GUICtrlSetState($Bar[5], $GUI_SHOW)
 	  GUICtrlSetState($AbrtBtn[4], $GUI_SHOW)
    Else
+	  If $Chk[4] Then Return
 	  GUICtrlSetState($Pic[3], $GUI_SHOW)
 	  GUICtrlSetState($Pic[11], $GUI_SHOW)
 	  GUICtrlSetState($Grp[2], $GUI_SHOW)
@@ -906,6 +910,7 @@ Func _Vrf_Prep()
 			ProcessClose($Run[0])
 			ProcessClose($Run[1])
 			$Chk[1] = True
+			$Chk[4] = True
 			ExitLoop
 		 Case Else
 			If Not ProcessExists($RunProc) And Not ProcessExists($Run[0])  And Not ProcessExists($Run[1]) Then
@@ -955,6 +960,7 @@ Func _Vrf_PrepEnd()
 		 _LiVw()
 	  EndIf
    Else
+	  If $Chk[4] Then _DataDel()
 	  GUICtrlSetState($Pic[3], $GUI_SHOW)
 	  GUICtrlSetState($Pic[11], $GUI_SHOW)
 	  GUICtrlSetState($Grp[2], $GUI_SHOW)

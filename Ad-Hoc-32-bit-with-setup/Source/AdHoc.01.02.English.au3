@@ -1,4 +1,4 @@
-Local $StrWin[4] = ["Ad Hoc 1.00", "System scan settings", "Attention!", "This files were not copied/moved:"]
+Local $StrWin[4] = ["Ad Hoc 1.01", "System scan settings", "Attention!", "This files were not copied/moved:"]
 
 Local $StrMsg[4] = ["Comparison is not possible. Check system scan settings.", _
 	 "Do you want to clear out the ""...\PortApp\Data"" folder?", _
@@ -6,7 +6,7 @@ Local $StrMsg[4] = ["Comparison is not possible. Check system scan settings.", _
 	 "Are you sure?"]
 
 Local $StrBlk[16] = ["", _
-	 "You have run Ad Hoc 1.00", _
+	 "You have run Ad Hoc 1.01", _
 	 "This program is intended for portable applications creating in the PAF format (PortableApps.com Format)." & @CRLF & @CRLF & _
 	 "A brief description of the PAF structure consists of a launcher, directory with the installed application and directory with the application settings." & @CRLF & @CRLF & _
 	 "The portable application that was created by Ad Hoc runs from any directory and it does not leave any traces of its work in the operating system." & @CRLF & @CRLF & _
