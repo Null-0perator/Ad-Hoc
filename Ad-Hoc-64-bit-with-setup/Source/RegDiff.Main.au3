@@ -56,7 +56,9 @@ EndFunc
 Func _Generate($Prm_0, $Prm_1)
    Local $Path = $File[0] & 'RegData_' & $Prm_1, $RunProc, $FO, $Msv, $Bnd
 
-   $RunProc = RunWait(@ComSpec & ' /U /C REG EXPORT ' & $Prm_0 & ' "' & $Path & '.reg" /y', '', @SW_HIDE)
+   FileDelete($Path & '.reg')
+   Sleep(40)
+   $RunProc = RunWait(@ComSpec & ' /U /C REG EXPORT ' & $Prm_0 & ' "' & $Path & '.reg"', '', @SW_HIDE)
 
    $FO = FileOpen($Path & '.reg', 32)
    $Msv = StringRegExp(FileRead($FO), "\n\[.+", 3)
@@ -177,21 +179,6 @@ Func _Export()
 		 $RgType = @extended
 		 Switch $RgType
 			Case 1
-			   If StringInStr($RgPrm, $Sepr) Then
-				  $ChkSepr[0] = True
-				  Do
-					 $Sepr = $Sepr & "::::@"
-					 $T = $T+1
-					 If $T > $Max Then $Max = $T
-				  Until Not StringInStr($RgPrm, $Sepr)
-			   EndIf
-			   $WrP = $RgPrm
-			   $RgPrm = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
-			   For $Var in $Envir
-				  $RgPrm = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
-			   Next
 			   If StringInStr($RgVal, $Sepr) Then
 				  $ChkSepr[0] = True
 				  Do
@@ -200,12 +187,37 @@ Func _Export()
 					 If $Q > $Max Then $Max = $Q
 				  Until Not StringInStr($RgVal, $Sepr)
 			   EndIf
-			   $WrV = $RgVal
-			   $RgVal = StringReplace($RgVal, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
+			   $WrV = StringReplace($RgVal, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[0] Then $RgVal = $WrV
+				  $CheckLoop = True
+			   EndIf
 			   For $Var in $Envir
-				  $RgVal = StringReplace($RgVal, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
+				  $WrV = StringReplace($RgVal, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[0] Then $RgVal = $WrV
+					 $CheckLoop = True
+				  EndIf
+			   Next
+			   If StringInStr($RgPrm, $Sepr) Then
+				  $ChkSepr[0] = True
+				  Do
+					 $Sepr = $Sepr & "::::@"
+					 $T = $T+1
+					 If $T > $Max Then $Max = $T
+				  Until Not StringInStr($RgPrm, $Sepr)
+			   EndIf
+			   $WrP = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[0] Then $RgPrm = $WrP
+				  $CheckLoop = True
+			   EndIf
+			   For $Var in $Envir
+				  $WrP = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[0] Then $RgPrm = $WrP
+					 $CheckLoop = True
+				  EndIf
 			   Next
 			   If $CheckLoop Then
 				  If $ChkSect[1] Then
@@ -216,18 +228,18 @@ Func _Export()
 					 FileWriteLine($FO[3], "[" & $Msv[$i] & "]")
 					 $ChkSect[2] = False
 				  EndIf
-				  If StringInStr($WrP, "[", 0, 1, 1, 1) Or StringInStr($WrP, "=") Then
+				  If StringInStr($RgPrm, "[", 0, 1, 1, 1) Or StringInStr($RgPrm, "=") Then
 					 If Not $ChkSepr[0] Then
 						FileWriteLine($FO[2], StringToBinary($RgPrm, 2) & "=BIN_REG_SZ=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], StringToBinary($WrP, 2) & "=BIN_REG_SZ=" & $WrV)
+						FileWriteLine($FO[3], StringToBinary($RgPrm, 2) & "=BIN_REG_SZ=" & $RgVal)
 					 EndIf
 					 $Chk[0] = True
 				  Else
 					 If Not $ChkSepr[0] Then
 						FileWriteLine($FO[2], $RgPrm & "=REG_SZ=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], $WrP & "=REG_SZ=" & $WrV)
+						FileWriteLine($FO[3], $RgPrm & "=REG_SZ=" & $RgVal)
 					 EndIf
 				  EndIf
 			   Else
@@ -242,21 +254,6 @@ Func _Export()
 				  EndIf
 			   EndIf
 			Case 2
-			   If StringInStr($RgPrm, $Sepr) Then
-				  $ChkSepr[1] = True
-				  Do
-					 $Sepr = $Sepr & "::::@"
-					 $T = $T+1
-					 If $T > $Max Then $Max = $T
-				  Until Not StringInStr($RgPrm, $Sepr)
-			   EndIf
-			   $WrP = $RgPrm
-			   $RgPrm = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
-			   For $Var in $Envir
-				  $RgPrm = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
-			   Next
 			   If StringInStr($RgVal, $Sepr) Then
 				  $ChkSepr[1] = True
 				  Do
@@ -265,12 +262,37 @@ Func _Export()
 					 If $Q > $Max Then $Max = $Q
 				  Until Not StringInStr($RgVal, $Sepr)
 			   EndIf
-			   $WrV = $RgVal
-			   $RgVal = StringReplace($RgVal, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
+			   $WrV = StringReplace($RgVal, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[1] Then $RgVal = $WrV
+				  $CheckLoop = True
+			   EndIf
 			   For $Var in $Envir
-				  $RgVal = StringReplace($RgVal, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
+				  $WrV = StringReplace($RgVal, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[1] Then $RgVal = $WrV
+					 $CheckLoop = True
+				  EndIf
+			   Next
+			   If StringInStr($RgPrm, $Sepr) Then
+				  $ChkSepr[1] = True
+				  Do
+					 $Sepr = $Sepr & "::::@"
+					 $T = $T+1
+					 If $T > $Max Then $Max = $T
+				  Until Not StringInStr($RgPrm, $Sepr)
+			   EndIf
+			   $WrP = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[1] Then $RgPrm = $WrP
+				  $CheckLoop = True
+			   EndIf
+			   For $Var in $Envir
+				  $WrP = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[1] Then $RgPrm = $WrP
+					 $CheckLoop = True
+				  EndIf
 			   Next
 			   If $CheckLoop Then
 				  If $ChkSect[1] Then
@@ -285,14 +307,14 @@ Func _Export()
 					 If Not $ChkSepr[1] Then
 						FileWriteLine($FO[2], StringToBinary($RgPrm, 2) & "=BIN_REG_EXPAND_SZ=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], StringToBinary($WrP, 2) & "=BIN_REG_EXPAND_SZ=" & $WrV)
+						FileWriteLine($FO[3], StringToBinary($RgPrm, 2) & "=BIN_REG_EXPAND_SZ=" & $RgVal)
 					 EndIf
 					 $Chk[1] = True
 				  Else
 					 If Not $ChkSepr[1] Then
 						FileWriteLine($FO[2], $RgPrm & "=REG_EXPAND_SZ=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], $WrP & "=REG_EXPAND_SZ=" & $WrV)
+						FileWriteLine($FO[3], $RgPrm & "=REG_EXPAND_SZ=" & $RgVal)
 					 EndIf
 				  EndIf
 			   Else
@@ -315,12 +337,17 @@ Func _Export()
 					 If $T > $Max Then $Max = $T
 				  Until Not StringInStr($RgPrm, $Sepr)
 			   EndIf
-			   $WrP = $RgPrm
-			   $RgPrm = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
+			   $WrP = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[2] Then $RgPrm = $WrP
+				  $CheckLoop = True
+			   EndIf
 			   For $Var in $Envir
-				  $RgPrm = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
+				  $WrP = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[2] Then $RgPrm = $WrP
+					 $CheckLoop = True
+				  EndIf
 			   Next
 			   If $CheckLoop Then
 				  If $ChkSect[1] Then
@@ -335,14 +362,14 @@ Func _Export()
 					 If Not $ChkSepr[2] Then
 						FileWriteLine($FO[2], StringToBinary($RgPrm, 2) & "=BIN_REG_BINARY=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], StringToBinary($WrP, 2) & "=BIN_REG_BINARY=" & $RgVal)
+						FileWriteLine($FO[3], StringToBinary($RgPrm, 2) & "=BIN_REG_BINARY=" & $RgVal)
 					 EndIf
 					 $Chk[2] = True
 				  Else
 					 If Not $ChkSepr[2] Then
 						FileWriteLine($FO[2], $RgPrm & "=REG_BINARY=" & $RgVal)
 					 Else
-						FileWriteLine($FO[2], $WrP & "=REG_BINARY=" & $RgVal)
+						FileWriteLine($FO[3], $RgPrm & "=REG_BINARY=" & $RgVal)
 					 EndIf
 				  EndIf
 			   Else
@@ -365,12 +392,17 @@ Func _Export()
 					 If $T > $Max Then $Max = $T
 				  Until Not StringInStr($RgPrm, $Sepr)
 			   EndIf
-			   $WrP = $RgPrm
-			   $RgPrm = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
+			   $WrP = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[3] Then $RgPrm = $WrP
+				  $CheckLoop = True
+			   EndIf
 			   For $Var in $Envir
-				  $RgPrm = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
+				  $WrP = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[3] Then $RgPrm = $WrP
+					 $CheckLoop = True
+				  EndIf
 			   Next
 			   If $CheckLoop Then
 				  If $ChkSect[1] Then
@@ -385,14 +417,14 @@ Func _Export()
 					 If Not $ChkSepr[3] Then
 						FileWriteLine($FO[2], StringToBinary($RgPrm, 2) & "=BIN_REG_DWORD=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], StringToBinary($WrP, 2) & "=BIN_REG_DWORD=" & $RgVal)
+						FileWriteLine($FO[3], StringToBinary($RgPrm, 2) & "=BIN_REG_DWORD=" & $RgVal)
 					 EndIf
 					 $Chk[3] = True
 				  Else
 					 If Not $ChkSepr[3] Then
 						FileWriteLine($FO[2], $RgPrm & "=REG_DWORD=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], $WrP & "=REG_DWORD=" & $RgVal)
+						FileWriteLine($FO[3], $RgPrm & "=REG_DWORD=" & $RgVal)
 					 EndIf
 				  EndIf
 			   Else
@@ -407,21 +439,6 @@ Func _Export()
 				  EndIf
 			   EndIf
 			Case 7
-			   If StringInStr($RgPrm, $Sepr) Then
-				  $ChkSepr[4] = True
-				  Do
-					 $Sepr = $Sepr & "::::@"
-					 $T = $T+1
-					 If $T > $Max Then $Max = $T
-				  Until Not StringInStr($RgPrm, $Sepr)
-			   EndIf
-			   $WrP = $RgPrm
-			   $RgPrm = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
-			   For $Var in $Envir
-				  $RgPrm = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
-			   Next
 			   If StringInStr($RgVal, $Sepr) Then
 				  $ChkSepr[4] = True
 				  Do
@@ -430,12 +447,37 @@ Func _Export()
 					 If $Q > $Max Then $Max = $Q
 				  Until Not StringInStr($RgVal, $Sepr)
 			   EndIf
-			   $WrV = $RgVal
-			   $RgVal = StringReplace($RgVal, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
+			   $WrV = StringReplace($RgVal, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[4] Then $RgVal = $WrV
+				  $CheckLoop = True
+			   EndIf
 			   For $Var in $Envir
-				  $RgVal = StringReplace($RgVal, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
+				  $WrV = StringReplace($RgVal, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[4] Then $RgVal = $WrV
+					 $CheckLoop = True
+				  EndIf
+			   Next
+			   If StringInStr($RgPrm, $Sepr) Then
+				  $ChkSepr[4] = True
+				  Do
+					 $Sepr = $Sepr & "::::@"
+					 $T = $T+1
+					 If $T > $Max Then $Max = $T
+				  Until Not StringInStr($RgPrm, $Sepr)
+			   EndIf
+			   $WrP = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[4] Then $RgPrm = $WrP
+				  $CheckLoop = True
+			   EndIf
+			   For $Var in $Envir
+				  $WrP = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[4] Then $RgPrm = $WrP
+					 $CheckLoop = True
+				  EndIf
 			   Next
 			   If $CheckLoop Then
 				  If $ChkSect[1] Then
@@ -450,14 +492,14 @@ Func _Export()
 					 If Not $ChkSepr[4] Then
 						FileWriteLine($FO[2], StringToBinary($RgPrm, 2) & "=BIN_REG_MULTI_SZ=" & StringToBinary($RgVal, 2))
 					 Else
-						FileWriteLine($FO[3], StringToBinary($WrP, 2) & "=BIN_REG_MULTI_SZ=" & StringToBinary($WrV, 2))
+						FileWriteLine($FO[3], StringToBinary($RgPrm, 2) & "=BIN_REG_MULTI_SZ=" & StringToBinary($RgVal, 2))
 					 EndIf
 					 $Chk[4] = True
 				  Else
 					 If Not $ChkSepr[4] Then
 						FileWriteLine($FO[2], $RgPrm & "=REG_MULTI_SZ=" & StringToBinary($RgVal, 2))
 					 Else
-						FileWriteLine($FO[3], $WrP & "=REG_MULTI_SZ=" & StringToBinary($WrV, 2))
+						FileWriteLine($FO[3], $RgPrm & "=REG_MULTI_SZ=" & StringToBinary($RgVal, 2))
 					 EndIf
 				  EndIf
 			   Else
@@ -480,12 +522,17 @@ Func _Export()
 					 If $T > $Max Then $Max = $T
 				  Until Not StringInStr($RgPrm, $Sepr)
 			   EndIf
-			   $WrP = $RgPrm
-			   $RgPrm = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
-			   If @extended Then $CheckLoop = True
+			   $WrP = StringReplace($RgPrm, $ScriptDir, $Sepr & "ScriptDir")
+			   If @extended Then
+				  If  Not $ChkSepr[5] Then $RgPrm = $WrP
+				  $CheckLoop = True
+			   EndIf
 			   For $Var in $Envir
-				  $RgPrm = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
-				  If @extended Then $CheckLoop = True
+				  $WrP = StringReplace($RgPrm, EnvGet($Var), $Sepr & $Var)
+				  If @extended Then
+					 If  Not $ChkSepr[5] Then $RgPrm = $WrP
+					 $CheckLoop = True
+				  EndIf
 			   Next
 			   If $CheckLoop Then
 				  If $ChkSect[1] Then
@@ -500,14 +547,14 @@ Func _Export()
 					 If Not $ChkSepr[5] Then
 						FileWriteLine($FO[2], StringToBinary($RgPrm, 2) & "=BIN_REG_QWORD=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], StringToBinary($WrP, 2) & "=BIN_REG_QWORD=" & $RgVal)
+						FileWriteLine($FO[3], StringToBinary($RgPrm, 2) & "=BIN_REG_QWORD=" & $RgVal)
 					 EndIf
 					 $Chk[5] = True
 				  Else
 					 If Not $ChkSepr[5] Then
 						FileWriteLine($FO[2], $RgPrm & "=REG_QWORD=" & $RgVal)
 					 Else
-						FileWriteLine($FO[3], $WrP & "=REG_QWORD=" & $RgVal)
+						FileWriteLine($FO[3], $RgPrm & "=REG_QWORD=" & $RgVal)
 					 EndIf
 				  EndIf
 			   Else

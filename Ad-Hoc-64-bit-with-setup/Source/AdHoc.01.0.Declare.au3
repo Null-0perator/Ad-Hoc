@@ -14,7 +14,7 @@ Global Const $VK_ADD = 0x6B
 Global Const $VK_SUBTRACT = 0x6D
 
 Local $DrLst = DriveGetDrive("FIXED")
-Local $Chk[4] = [False, True, False, False]
+Local $Chk[5] = [False, True, False, False, False]
 Local $RegStr[2] = ["HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics", "AppliedDPI"]
 Local $FileMask[12] = [".exe", ".msi", ".bat", ".cmd", ".js", ".jse", ".msc", ".ps1", ".vbe", ".vbs", ".wsf", ".wsh"]
 Local $DPI = RegRead($RegStr[0], $RegStr[1]), $TxtSize = Ceiling(8.5*25/2400*$DPI)
